@@ -1,11 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
+import  Pie  from "./components/Piechart";
+import  Bar  from "./components/Barchart";
+import  Line  from "./components/Linechart";
+import  Scatter  from "./components/Scatterchart";
 import api from './api';
 
 interface Message {
   id: number;
   from: 'bot' | 'user';
-  text: string;
+  text: string,
+  chartType?: "bar" | "scatter" | "pie" | "line"; 
+  data?: unknown; 
 }
 
 interface Font {
@@ -51,17 +57,23 @@ export default function ChatCentral({ showSidebar, messages, setMessages, setFon
 
     setIsSending(true);
     const userMessage: Message = { id: Date.now(), from: 'user', text };
-    setMessages((m) => [...m, userMessage]);
+    setMessages((m) => [...m, userMessage])
+    const context = JSON.stringify(
+      messages.map(msg => ({ from: msg.from, text: msg.text, chart: msg.chartType, chartData: msg.data }))
+    );
     setInput('');
 
     try {
-      const req = await api.post("/agente", { data: { input: text } });
+     const req = await api.post("/Analyze", { data: { input: text, history: context } });
 
       if (req.status === 200) {
+         const {chartType, data } = req.data;
         const botMessage: Message = {
           id: Date.now() + 1,
           from: 'bot',
-          text: req.data?.resposta || "Aqui está sua resposta!"
+          text: req.data?.resposta || "Aqui está sua resposta!",
+          chartType: chartType || undefined,
+          data: chartType ? data : undefined,
         };
         setMessages((m) => [...m, botMessage]);
         showSidebar(true);
@@ -86,10 +98,28 @@ export default function ChatCentral({ showSidebar, messages, setMessages, setFon
         text: `Erro ao se comunicar com o servidor: ${e.message || e}`
       };
       setMessages((m) => [...m, errorMessage]);
+      
     } finally {
       setIsSending(false);
     }
   }
+
+
+  function renderChart(chartType?: string, data?: Array<number>) {
+      switch (chartType) {
+        case "bar":
+          return <Bar data={data} />;
+        case "scatter":
+          return <Scatter data={data} />;
+        case "pie":
+          return <Pie data={data} />;
+        case "line":
+          return <Line data={data} />;
+        default:
+          return null; 
+      }
+    }
+  
 
   function handleKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -122,6 +152,9 @@ export default function ChatCentral({ showSidebar, messages, setMessages, setFon
                 }}
               >
                 {m.text}
+                {m.chartType && (
+                  <div className="mt-2">{renderChart(m.chartType, m.data)}</div>
+                )}
               </div>
             </div>
           ))}
