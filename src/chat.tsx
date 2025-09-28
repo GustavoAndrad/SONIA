@@ -4,10 +4,8 @@ import ChatCentral from './ChatCentral';
 import SidebarDireita from './SidebarDireita';
 
 interface Font {
-  id: number;
-  name: string;
-  description: string;
-  link: string;
+
+  path: string;
 }
 
 export default function ChatUI() {
@@ -15,10 +13,7 @@ export default function ChatUI() {
   const [isShowSidebarDireita, setIsShowSidebarDireita] = useState(false);
 
   // estado das fontes
-  const [fonts, setFonts] = useState<Font[]>([
-    { id: 1, name: "Fonte A", description: "Descrição da Fonte A", link:"." },
-    { id: 2, name: "Fonte B", description: "Descrição da Fonte B", link:"." },
-  ]);
+  const [fonts, setFonts] = useState<Font[]>([]);
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row font-montserrat bg-[#F7F6F6]">

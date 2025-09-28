@@ -1,38 +1,48 @@
-import Highcharts from 'highcharts';
-import HighchartsReact from 'highcharts-react-official';
-
+import React from "react";
+import Highcharts from "highcharts";
+import HighchartsReact from "highcharts-react-official";
 
 interface LineProps {
   data: {
-    seriesNames: string[];   // nomes das séries, ex: ["Usina A", "Usina B"]
-    labels: string[];        // categorias do eixo X, ex: ["Jan", "Fev"]
-    values: number[][];      // array de arrays: cada subarray = dados da série correspondente
+    seriesName: string;             // Nome da série (ex: "Evolução das usinas")
+    labels: string[];               // Categorias no eixo X (ex: ["Usina1", "Usina2"])
+    data: { x: number; y: number }[]; // Dados: x será o índice da usina, y o valor
   };
 }
 
-function Line({ data }: LineProps) {
-   const series = data.seriesNames.map((name, i) => ({
-    name,
-    data: data.values[i],
+export default function Line({ data }: LineProps) {
+  const { seriesName, labels, data: points } = data;
+
+  // Mapeia os pontos recebidos para garantir que X corresponda ao índice da label
+  const normalized = points.map((point, i) => ({
+    x: i,
+    y: point.y
   }));
-  const options = {
+
+  const options: Highcharts.Options = {
     chart: {
-      type: 'line', 
-      
-      backgroundColor: null
+      type: "line",
+      width: 600,
+      height: 300,
+      backgroundColor: "transparent"
     },
-    title: {
-      text: '',
-      style: {
-        color: '#FFF'
+    title: { text: "" },
+    xAxis: {
+      categories: labels,
+      title: { text: "Usinas" }
+    },
+    yAxis: {
+      title: { text: "Evolução" }
+    },
+    series: [
+      {
+        name: seriesName,
+        type: "line",
+        data: normalized
       }
-    },
-    xAxis: { categories: data.labels },
-    yAxis: { title: { text: '' } },
-    series: series,
+    ],
+    credits: { enabled: false }
   };
 
   return <HighchartsReact highcharts={Highcharts} options={options} />;
 }
-
-export default Line;

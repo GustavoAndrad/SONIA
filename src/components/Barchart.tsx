@@ -8,15 +8,16 @@ interface BarProps {
   data: {
     seriesNames: string[];   // nomes das séries, ex: ["Usina A", "Usina B"]
     labels: string[];        // categorias do eixo X, ex: ["Jan", "Fev"]
-    values: number[][];      // array de arrays: cada subarray = dados da série correspondente
+    data: number[][];      // array de arrays: cada subarray = dados da série correspondente
   };
 }
 
 function Bar({ data }: BarProps){
-  const series = data.seriesNames.map((name, i) => ({
-    name,
-    data: data.values[i],
-  }));
+ const series = data.seriesNames.map((name, i) => ({
+  name,
+  data: data.data[i], 
+}));
+
       const options = {
     chart: {
       type: 'column',

@@ -1,10 +1,7 @@
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 
 interface Font {
-  id: number;
-  name: string;
-  description: string;
-  link: string;
+  path: string;
 }
 
 interface SidebarProps {
@@ -42,16 +39,16 @@ export default function SidebarDireita({ isShow, setIsShow, fonts }: SidebarProp
       </div>
 
       <nav className="flex-1 overflow-auto p-4 space-y-4">
-        <ul className="space-y-2">
-          {fonts.map((font) => (
-            <a key={font.id} href={font.link}>
-              <li className="mb-4 p-2 rounded-md hover:bg-gray-50 cursor-pointer border">
-                <div className="text-xs font-bold text-[#002246]">{font.name}</div>
-                <div className="text-sm text-[#090A59]">{font.description}</div>
+        <ul className="space-y-3 w-full">
+            {fonts.map((font, index) => (
+              <li
+                key={index}
+                className="mb-4 p-2 rounded-md hover:bg-gray-50 cursor-pointer border w-full"
+              >
+                <div className="text-xs font-bold text-[#002246] break-words">{font.path}</div>
               </li>
-            </a>
-          ))}
-        </ul>
+            ))}
+          </ul>
       </nav>
     </>
   )}

@@ -38,6 +38,8 @@ export default function ChatCentral({ showSidebar, messages, setMessages, setFon
   const placeholders = [
     "Qual a usina mais ao sul do mundo?",
   ];
+  // const question = "Retorne um gráfico de barras com a geração de energia por região em 2025"
+  
 
   useEffect(() => {
     const random = Math.floor(Math.random() * placeholders.length);
@@ -50,7 +52,6 @@ export default function ChatCentral({ showSidebar, messages, setMessages, setFon
   }, [messages]);
 
   async function handleSend() {
-    showSidebar(true);
 
     const text = input.trim();
     if (!text || isSending) return;
@@ -58,46 +59,115 @@ export default function ChatCentral({ showSidebar, messages, setMessages, setFon
     setIsSending(true);
     const userMessage: Message = { id: Date.now(), from: 'user', text };
     setMessages((m) => [...m, userMessage])
+    const arrHist = []
     const context = JSON.stringify(
       messages.map(msg => ({ from: msg.from, text: msg.text, chart: msg.chartType, chartData: msg.data }))
     );
+    arrHist.push(context)
     setInput('');
 
     try {
-     const req = await api.post("/Analyze", { data: { input: text, history: context } });
+    //  const req = await api.post("/analyze", { question: text, chat_history: [] });
+// const {chart, data_points } = req.data;
+       const botMessage: Message = {
+  id: Date.now() + 1,
+  from: "bot",
+  text: "Aqui está a geração de energia por região em 2025",
+  chartType: "bar",
+  data: {
+    seriesNames: [
+      "NORDESTE",
+      "NORTE",
+      "SISTEMA INTERLIGADO NACIONAL",
+      "SUDESTE/CENTRO-OESTE",
+      "SUL"
+    ],
+    labels: ["Hidráulica", "Térmica", "Eólica", "Solar"],
+    data: [
+      // Nordeste
+      [
+        { x: 0, y: 22192799.99 },
+        { x: 1, y: 415154.0 },
+        { x: 2, y: 16070653.0 },
+        { x: 3, y: 20578010.0 }
+      ],
+      // Norte
+      [
+        { x: 0, y: 6818531.99 },
+        { x: 1, y: 1576087.0 },
+        { x: 2, y: 401685.0 },
+        { x: 3, y: 3651023.0 }
+      ],
+      // Sistema Interligado Nacional
+      [
+        { x: 0, y: 40778712.0 },
+        { x: 1, y: 6835338.0 },
+        { x: 2, y: 17662519.0 },
+        { x: 3, y: 64094240.0 }
+      ],
+      // Sudeste/Centro-Oeste
+      [
+        { x: 0, y: 23801969.99 },
+        { x: 1, y: 4510835.0 },
+        { x: 2, y: 5001.0 },
+        { x: 3, y: 32165730.0 }
+      ],
+      // Sul
+      [
+        { x: 0, y: 7938929.99 },
+        { x: 1, y: 333262.0 },
+        { x: 2, y: 1185179.99 },
+        { x: 3, y: 7699480.0 }
+      ]
+    ]
+  }
+};
 
-      if (req.status === 200) {
-         const {chartType, data } = req.data;
-        const botMessage: Message = {
-          id: Date.now() + 1,
-          from: 'bot',
-          text: req.data?.resposta || "Aqui está sua resposta!",
-          chartType: chartType || undefined,
-          data: chartType ? data : undefined,
-        };
         setMessages((m) => [...m, botMessage]);
+        // setMessages((m) => [...m, botMessage]);
+        const datasets_consumed =  [
+        {
+            "path": "s3://ons-aws-prod-opendata/dataset/balanco_dessem_detalhe/"
+        },
+        {
+            "path": "s3://ons-aws-prod-opendata/dataset/balanco_dessem_geral/"
+        },
+        {
+            "path": "s3://ons-aws-prod-opendata/dataset/geracao_usina_2_ho/"
+        }
+    ]
+        const datasets = datasets_consumed;
+        const fontsArray = datasets.map(dataset => ({
+          path: dataset.path
+        }));
+        // console.log(fontsArray)
+        setFonts(fontsArray);
+        
         showSidebar(true);
+  //     if (req.status === 200) {
+         
 
-        setFonts([
-    { id: 1, name: "Fonte A", description: "Descrição da Fonte A", link:"." },
-    { id: 2, name: "Fonte B", description: "Descrição da Fonte B",link:"." },
-  ])
-      } else {
-        const errorMessage: Message = {
-          id: Date.now() + 2,
-          from: 'bot',
-          text: `Houve um problema de comunicação com servidor (status: ${req.status}). Tente novamente mais tarde.`
-        };
-        setMessages((m) => [...m, errorMessage]);
-      }
+  // //       setFonts([
+  // //   { id: 1, name: "Fonte A", description: "Descrição da Fonte A", link:"." },
+  // //   { id: 2, name: "Fonte B", description: "Descrição da Fonte B",link:"." },
+  // // ])
+  //     } else {
+  //       const errorMessage: Message = {
+  //         id: Date.now() + 2,
+  //         from: 'bot',
+  //         text: `Houve um problema de comunicação com servidor (status: ${req.status}). Tente novamente mais tarde.`
+  //       };
+  //       setMessages((m) => [...m, errorMessage]);
+  //     }
 
     } catch (e) {
-      const errorMessage: Message = {
-        id: Date.now() + 3,
-        from: 'bot',
-        text: `Erro ao se comunicar com o servidor: ${e.message || e}`
-      };
-      setMessages((m) => [...m, errorMessage]);
+      // const errorMessage: Message = {
+      //   id: Date.now() + 3,
+      //   from: 'bot',
+      //   text: `Erro ao se comunicar com o servidor: ${e.message || e}`
+      // };
+      // setMessages((m) => [...m, errorMessage]);
+     
       
     } finally {
       setIsSending(false);
