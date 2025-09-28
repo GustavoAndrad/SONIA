@@ -23,7 +23,7 @@ export default function ChatUI() {
   return (
     <div className="min-h-screen flex flex-col md:flex-row font-montserrat bg-[#F7F6F6]">
       {/* Sidebar esquerda */}
-      <SidebarEsquerda messages={messages}/>
+      <SidebarEsquerda messages={messages} fonts={fonts}/>
 
       {/* Chat central */}
       <div className="flex-1 flex">

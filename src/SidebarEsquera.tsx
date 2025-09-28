@@ -1,38 +1,78 @@
 import { useState } from "react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface Props {
   messages: object[];
+  fonts: object[];
 }
 
-export default function SidebarEsquerda({ messages }: Props) {
+export default function SidebarEsquerda({ messages, fonts }: Props) {
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = async () => {
-    setIsExporting(true);
+  setIsExporting(true);
+  try {
+    const doc = new jsPDF();
 
-    try {
-      const data = JSON.stringify(messages, null, 2);
+    // Título
+    doc.setFontSize(18);
+    doc.setTextColor("#090A59");
+    doc.text("Conversa com S.O.N.I.A", 14, 20);
 
-      const blob = new Blob([data], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
+    // Subtítulo
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+    doc.text(`Exportado em ${new Date().toLocaleString("pt-BR")}`, 14, 28);
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "conversa.json";
-      a.click();
+    // Logo opcional
+    doc.addImage("/assistant.png", "PNG", 170, 10, 30, 30);
 
-      URL.revokeObjectURL(url);
-    } finally {
-      // MUDAR DEPOISSS --> PDF???? :) 
-      setTimeout(() => setIsExporting(false), 800);
-    }
+    // Tabela de mensagens
+    const rows = messages.map((msg: any) => [
+    msg.from === "user" ? "Usuário" : "S.O.N.I.A",
+    msg.text || "[Gráfico/Conteúdo]"
+    ]);
+
+    // Tabela de fontes
+    const rows2 = fonts.map((font: any) => [
+    font.name
+    ]);
+
+    // Tabela 1 - Mensagens
+    autoTable(doc, {
+    startY: 40,
+    head: [["Remetente", "Mensagem"]],
+    body: rows,
+    theme: "striped",
+    styles: { fontSize: 10, cellPadding: 4 },
+    headStyles: { fillColor: [9, 10, 89] }, // #090A59
+    });
+
+    // Pegar a posição depois da primeira tabela
+    const finalY = (doc as any).lastAutoTable.finalY || 40;
+
+    // Tabela 2 - Fontes
+    autoTable(doc, {
+    startY: finalY + 10, // começa logo depois da tabela anterior
+    head: [["Fonte Utilizadas"]],
+    body: rows2,
+    theme: "grid",
+    styles: { fontSize: 10, cellPadding: 4 },
+    headStyles: { fillColor: [249, 67, 0] }, // #F94300
+    });
+
+    doc.save("conversa.pdf");
+  } finally {
+    setTimeout(() => setIsExporting(false), 800);
+  }
   };
 
   return (
     <aside className="w-full md:w-72 border-r flex flex-col bg-white h-fit md:h-screen ">
       {/* Cabeçalho */}
       <div className="px-4 py-6 flex items-center gap-3 border-b">
-        <div className="w-fit h-fit rounded flex items-center justify-center text-white font-bold">
+        <div className="w-20 h-20 rounded flex items-center justify-center text-white font-bold">
           <img src="/assistant.png"></img>
         </div>
         <div>

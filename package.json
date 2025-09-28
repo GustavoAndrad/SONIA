@@ -16,6 +16,8 @@
     "axios": "^1.12.2",
     "highcharts": "^12.4.0",
     "highcharts-react-official": "^3.2.2",
+    "jspdf": "^3.0.3",
+    "jspdf-autotable": "^5.0.2",
     "phosphor-react": "^1.4.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
