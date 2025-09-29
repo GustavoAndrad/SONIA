@@ -21,7 +21,7 @@ function Bar({ data }: BarProps){
       const options = {
     chart: {
       type: 'column',
-      width: 600,
+      
       height: 300,
       backgroundColor: null
     },

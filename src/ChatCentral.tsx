@@ -78,7 +78,6 @@ export default function ChatCentral({ showSidebar, messages, setMessages, setFon
     seriesNames: [
       "NORDESTE",
       "NORTE",
-      "SISTEMA INTERLIGADO NACIONAL",
       "SUDESTE/CENTRO-OESTE",
       "SUL"
     ],
@@ -99,12 +98,7 @@ export default function ChatCentral({ showSidebar, messages, setMessages, setFon
         { x: 3, y: 3651023.0 }
       ],
       // Sistema Interligado Nacional
-      [
-        { x: 0, y: 40778712.0 },
-        { x: 1, y: 6835338.0 },
-        { x: 2, y: 17662519.0 },
-        { x: 3, y: 64094240.0 }
-      ],
+    
       // Sudeste/Centro-Oeste
       [
         { x: 0, y: 23801969.99 },
